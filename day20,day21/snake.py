@@ -1,12 +1,14 @@
 from turtle import Turtle,Screen
-import food
-import score
+from food import Food
+from score import Score
 import time
 
 class Snake:
     def __init__(self):
         self.snake = []
         self.screen = Screen()
+        self.food = Food()
+        self.score = Score()
 
     def set_screen(self):
         self.screen.setup(width=600, height=600)
@@ -33,6 +35,10 @@ class Snake:
             if not self.check_live():
                 print("Game Over")
                 break
+            if self.snake[0].distance(self.food) < 15:
+                print("nom nom nom")
+                self.food.refresh()
+                self.score.increase_score()
             for i in reversed(range(1,len(self.snake))):
                 t_x,t_y = self.snake[i - 1].pos()
                 self.snake[i].goto(t_x,t_y)
