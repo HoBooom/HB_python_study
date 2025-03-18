@@ -15,6 +15,12 @@ class Snake:
         self.screen.bgcolor('black')
         self.screen.title("My Snake Game")
 
+    def reset(self):
+        for seg in self.snake:
+            seg.hideturtle()
+        self.snake.clear()
+        self.new_snake()
+        self.move_snake()
 
     def new_snake(self):
         start_x,start_y = 0,0
@@ -34,6 +40,8 @@ class Snake:
             self.screen.update()
             if not self.check_live():
                 print("Game Over")
+                self.score.reset()
+                self.reset()
                 break
             if self.snake[0].distance(self.food) < 15:
                 print("nom nom nom")
@@ -43,7 +51,7 @@ class Snake:
                 t_x,t_y = self.snake[i - 1].pos()
                 self.snake[i].goto(t_x,t_y)
             self.snake[0].forward(20)
-        # self.screen.exitonclick()
+        self.screen.exitonclick()
 
     def change_direction(self):
         self.screen.listen()
