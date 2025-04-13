@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
 import pyperclip
+import json
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
@@ -25,19 +26,41 @@ def save_password():
     email = email_entry.get()
     website = website_entry.get()
     password = password_entry.get()
+    new_data = {
+        website: {
+            'email': email,
+            'password': password
+        }
+    }
     if len(email) == 0 or len(website) == 0 or len(password) == 0:
         messagebox.showinfo("Error", "Please enter all fields")
-
-    is_ok = messagebox.askokcancel(title="Save Password", message=f"These are the details entered: \nEmail : {email}\nWebsite : {website}\nPassword : {password}, Is it ok to save?")
-    if is_ok:
-        with open(f"./password.txt", mode="a") as saved_file:
-            saved_file.write(f"\n{website} | {email} | {password}")
+    else:
+    #is_ok = messagebox.askokcancel(title="Save Password", message=f"These are the details entered: \nEmail : {email}\nWebsite : {website}\nPassword : {password}, Is it ok to save?")
+    #if is_ok:
+    # saved_file.write(f"\n{website} | {email} | {password}")
+        try:
+            with open(f"./password.json", mode="r") as saved_file:
+                data = json.load(saved_file)
+        except:
+            with open(f"./password.json", mode="w") as saved_file:
+                json.dump(new_data, saved_file,indent=4)
+        else:
+            data.update(new_data)
+            with open(f"./password.json", mode="w") as saved_file:
+                json.dump(data, saved_file, indent=4)
+        finally:
             website_entry.delete(0, END)
             password_entry.delete(0, END)
 
 
-
-
+def show_password():
+    website = website_entry.get()
+    with open(f"./password.json", mode="r") as saved_file:
+        data = json.load(saved_file)
+    try:
+        messagebox.showinfo(title=f"{website}", message=f"Email: {data[website]["email"]}\nPassword: {data[website]["password"]}")
+    except:
+        messagebox.showinfo(title="Error", message="Can't find email information")
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -54,9 +77,12 @@ canvas.grid(row=0, column=1)
 
 website_label = Label(text="Website:", background='white', fg='black')
 website_label.grid(row=1, column=0)
-website_entry = Entry(width=38, background='white', fg="black", highlightthickness=0)
-website_entry.grid(row=1, column=1,columnspan=2)
+website_entry = Entry(width=21, background='white', fg="black", highlightthickness=0)
+website_entry.grid(row=1, column=1)
 website_entry.focus()
+website_password_search_btn = Button(text="Search", background='white', fg='black', command=show_password)
+website_password_search_btn.config(width=13, highlightbackground='white')
+website_password_search_btn.grid(row=1, column=2)
 
 email_label = Label(text="Email/Username:", bg='white', fg='black')
 email_label.grid(row=2, column=0)
